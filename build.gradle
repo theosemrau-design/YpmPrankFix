@@ -7,13 +7,16 @@ group = 'dev.errnicraft'
 
 repositories {
     mavenCentral()
-    maven { url = "https://fabricmc.net" }
+    // Hier ist der korrigierte Pfad mit "maven." am Anfang!
+    maven { url = "https://maven.fabricmc.net/" }
 }
 
 dependencies {
+    // Lädt die Fabric-Schnittstelle fehlerfrei über die korrekte URL
     implementation "net.fabricmc:fabric-loader:0.15.11"
 }
 
+// Stellt sicher, dass die fabric.mod.json mit in das JAR-Archiv wandert
 jar {
     from sourceSets.main.resources
 }
