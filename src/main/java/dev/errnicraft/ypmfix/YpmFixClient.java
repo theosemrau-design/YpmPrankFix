@@ -3,25 +3,28 @@ package dev.errnicraft.ypmfix;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.loader.api.FabricLoader;
+import dev.errnicraft.ypm.ShowDisclaimerPayload;
 
 public class YpmFixClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        // Die Mod schaltet sich nur ein, wenn die Haupt-Mod geladen ist
         if (!FabricLoader.getInstance().isModLoaded("ypm")) {
             return;
         }
 
-        // Fängt das Paket über die simulierte Klasse ab und blockiert den Disclaimer komplett
-        ClientPlayNetworking.registerGlobalReceiver(dev.errnicraft.ypm.ShowDisclaimerPayload.Companion.getID(), (payload, context) -> {
-            // Absichtlich leer – das Paket verpufft wirkungslos im Hintergrund
+        // Registriert das Fake-Paket im System, damit Minecraft 1.21 es akzeptiert
+        PayloadTypeRegistry.playS2C().register(ShowDisclaimerPayload.ID, ShowDisclaimerPayload.CODEC);
+
+        // Fängt den Kanal ab und leitet ihn ins Leere
+        ClientPlayNetworking.registerGlobalReceiver(ShowDisclaimerPayload.ID, (payload, context) -> {
+            // Absichtlich leer – der Disclaimer blockiert!
         });
 
-        // Führt den SafeMode-Befehl beim Einloggen in eine Welt vollautomatisch aus
+        // Führt den safeMode-Befehl beim Weltbeitritt aus
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             if (client.getNetworkHandler() != null) {
-                // Sendet den Befehl unsichtbar an den Server (ohne "/")
                 client.getNetworkHandler().sendCommand("ypmconfig safeMode False");
             }
         });
