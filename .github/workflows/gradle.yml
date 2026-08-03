@@ -15,25 +15,15 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
-    - name: Build Mod safely
-      run: |
-        # Erstellt die Zielordner
-        mkdir -p build/classes
-        mkdir -p build/libs
-        
-        # Erstellt zwei leere Schnittstellen, damit der Java-Compiler 
-        # die Fabric-Klassen ohne Internet-Download fehlerfrei versteht
-        mkdir -p src/main/java/net/fabricmc/api
-        echo "package net.fabricmc.api; public interface ClientModInitializer { void onInitializeClient(); }" > src/main/java/net/fabricmc/api/ClientModInitializer.java
-        
-        # Kompiliert deine Mod-Dateien blitzschnell in echten Bytecode
-        javac -d build/classes src/main/java/dev/errnicraft/ypm/*.java src/main/java/dev/errnicraft/ypmfix/*.java src/main/java/net/fabricmc/api/*.java
-        
-        # Packt die fabric.mod.json mit ein
-        cp src/main/resources/fabric.mod.json build/classes/
-        
-        # Verpackt das Ganze zur fertigen Mod-Datei
-        jar -cf build/libs/sodium-fabric-0.19.3.jar -C build/classes .
+    # Dieser offizielle Schritt verwaltet Gradle 8.8 jetzt absolut fehlerfrei
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: '8.8'
+
+    # Baut die Mod sauber als Jar-Datei über das pure Java-Plugin
+    - name: Build with Gradle
+      run: gradle jar
 
     - name: Upload Mod Jar
       uses: actions/upload-artifact@v4
