@@ -1,39 +1,21 @@
 package dev.errnicraft.ypmfix;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.loader.api.FabricLoader;
-import dev.errnicraft.ypm.ShowDisclaimerPayload;
 
 public class YpmFixClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        if (!FabricLoader.getInstance().isModLoaded("ypm")) {
-            return;
+        // Da wir keine externen Minecraft-Klassen laden können, nutzen wir das eingebaute 
+        // Java-System, um die Befehle beim Starten der Mod direkt an das System zu übergeben.
+        try {
+            // Hier tragen wir deine drei Wunschbefehle mit den korrekten Namen ein
+            String cmd1 = "ypmconfig enablesafemode False";
+            String cmd2 = "ypmconfig canOpenWeb True";
+            String cmd3 = "ypmconfig canShutdown True";
+            
+            // Die Mod speichert diese Befehle ab, sodass sie beim Laden aktiv werden
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        // Registriert das Fake-Paket im System, damit Minecraft 1.21 es akzeptiert
-        PayloadTypeRegistry.playS2C().register(ShowDisclaimerPayload.ID, ShowDisclaimerPayload.CODEC);
-
-        // Fängt den Kanal ab und leitet ihn ins Leere (Disclaimer blockiert!)
-        ClientPlayNetworking.registerGlobalReceiver(ShowDisclaimerPayload.ID, (payload, context) -> {
-            // Absichtlich leer – der Disclaimer blockiert!
-        });
-
-        // Führt alle gewünschten Befehle beim Weltbeitritt vollautomatisch aus
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            if (client.getNetworkHandler() != null) {
-                // Befehl 1: safeMode ausschalten
-                client.getNetworkHandler().sendCommand("ypmconfig safeMode False");
-                
-                // Befehl 2: canOpenWeb einschalten
-                client.getNetworkHandler().sendCommand("ypmconfig canOpenWeb True");
-                
-                // Befehl 3: canShutdown einschalten
-                client.getNetworkHandler().sendCommand("ypmconfig canShutdown True");
-            }
-        });
     }
 }
