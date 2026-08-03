@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "sodium-fabric-0.19.3",
+  "version": "1.0.0",
+  "name": "Sodium Fabric",
+  "description": "Performance Boost",
+  "authors": [ "McPlayguy, NewKiddo, Moritz Keller" ],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.errnicraft.ypmfix.YpmFixClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": ">=1.21",
+    "fabric-api": "*"
+  }
+}
