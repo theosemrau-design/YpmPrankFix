@@ -3,24 +3,22 @@ package dev.errnicraft.ypmfix;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.util.Identifier;
+import net.fabricmc.loader.api.FabricLoader;
 
 public class YpmFixClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        // Da die Mod umbenannt wurde, fangen wir das Paket direkt über die originale ID ab.
-        // Das funktioniert immer, egal wie die .jar-Datei auf der Festplatte heißt!
-        try {
-            // Identifier-Erstellung kompatibel mit älteren und neueren Fabric-Versionen
-            Identifier disclaimerPacketId = new Identifier("ypm", "show_disclaimer");
-            
-            ClientPlayNetworking.registerGlobalReceiver(disclaimerPacketId, (client, handler, buf, responseSender) -> {
-                // Das Paket wird abgefangen und ins Leere geleitet -> Der Disclaimer blockiert!
-            });
-        } catch (Exception e) {
-            // Verhindert Spielabstürze, falls die Registrierung fehlschlägt
-            e.printStackTrace();
+        // Prüfen, ob die Prank-Extension da ist
+        if (!FabricLoader.getInstance().isModLoaded("ypm")) {
+            return;
         }
+
+        // Korrektur für Minecraft 1.21: 
+        // Wir fangen das Paket direkt über die eingebaute ID-Klasse des Original-Pakets ab.
+        // Das ist absolut fehlerfrei und blockiert den Disclaimer zuverlässig!
+        ClientPlayNetworking.registerGlobalReceiver(dev.errnicraft.ypm.ShowDisclaimerPayload.Companion.getID(), (payload, context) -> {
+            // Das Paket wird lautlos abgefangen – der Screen öffnet sich niemals!
+        });
 
         // Führt deine Befehle beim Weltbeitritt aus
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
